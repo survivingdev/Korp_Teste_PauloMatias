@@ -1,0 +1,44 @@
+# Variáveis de ambiente / segredos
+.env
+.env.*
+!.env.example
+
+# .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+TestResults/
+coverage/
+
+# Angular / Node.js
+node_modules/
+.angular/
+dist/
+out-tsc/
+.npm/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDEs / editores
+.vscode/
+.idea/
+
+# Logs locais
+*.log
+logs/
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Dados locais de banco / infraestrutura
+infra/postgres/data/
+
+# Arquivos temporários
+*.tmp
+*.temp
+*.bak
