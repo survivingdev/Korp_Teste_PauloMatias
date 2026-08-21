@@ -35,9 +35,6 @@ logs/
 Thumbs.db
 Desktop.ini
 
-# Dados locais de banco / infraestrutura
-infra/postgres/data/
-
 # Arquivos temporários
 *.tmp
 *.temp
