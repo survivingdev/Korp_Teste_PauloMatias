@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using ServicoEstoque.Api.Aplicacao;
 using ServicoEstoque.Api.Dados;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,8 @@ var stringConexao = builder.Configuration.GetConnectionString("Estoque")
 
 builder.Services.AddDbContext<EstoqueDbContext>(opcoes =>
     opcoes.UseNpgsql(stringConexao));
+
+builder.Services.AddScoped<ServicoBaixaEstoque>();
 
 var app = builder.Build();
 
