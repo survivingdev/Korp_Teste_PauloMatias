@@ -1,10 +1,181 @@
 <header class="cabecalho-pagina">
   <div>
     <h1>Produtos</h1>
-    <p>Cadastre produtos e acompanhe o saldo disponível em estoque.</p>
+    <p>
+      Cadastre produtos e acompanhe o saldo disponível em estoque.
+    </p>
   </div>
+
+  <button
+    type="button"
+    class="botao-secundario"
+    (click)="carregarProdutos()"
+    [disabled]="carregando()"
+  >
+    Atualizar lista
+  </button>
 </header>
 
-<div class="cartao">
-  <p>A gestão de produtos será implementada nesta seção.</p>
+@if (mensagemSucesso()) {
+  <div class="mensagem mensagem--sucesso" role="status">
+    {{ mensagemSucesso() }}
+  </div>
+}
+
+@if (mensagemErro()) {
+  <div class="mensagem mensagem--erro" role="alert">
+    {{ mensagemErro() }}
+  </div>
+}
+
+<div class="grade">
+  <section class="cartao">
+    <div class="cartao__cabecalho">
+      <div>
+        <h2>Novo produto</h2>
+        <p>Informe os dados iniciais do produto.</p>
+      </div>
+    </div>
+
+    <form
+      class="formulario"
+      [formGroup]="formulario"
+      (ngSubmit)="cadastrarProduto()"
+    >
+      <div class="campo">
+        <label for="codigo">Código</label>
+
+        <input
+          id="codigo"
+          type="text"
+          formControlName="codigo"
+          placeholder="Ex.: PROD-003"
+          maxlength="50"
+        />
+
+        @if (
+          formulario.controls.codigo.touched &&
+          formulario.controls.codigo.invalid
+        ) {
+          <span class="campo__erro">
+            Informe um código válido.
+          </span>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="descricao">Descrição</label>
+
+        <input
+          id="descricao"
+          type="text"
+          formControlName="descricao"
+          placeholder="Ex.: Teclado mecânico"
+          maxlength="200"
+        />
+
+        @if (
+          formulario.controls.descricao.touched &&
+          formulario.controls.descricao.invalid
+        ) {
+          <span class="campo__erro">
+            Informe a descrição do produto.
+          </span>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="saldo">Saldo inicial</label>
+
+        <input
+          id="saldo"
+          type="number"
+          formControlName="saldo"
+          min="0"
+          step="1"
+        />
+
+        @if (
+          formulario.controls.saldo.touched &&
+          formulario.controls.saldo.invalid
+        ) {
+          <span class="campo__erro">
+            O saldo deve ser zero ou maior.
+          </span>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="botao-primario"
+        [disabled]="salvando()"
+      >
+        @if (salvando()) {
+          Cadastrando...
+        } @else {
+          Cadastrar produto
+        }
+      </button>
+    </form>
+  </section>
+
+  <section class="cartao cartao--lista">
+    <div class="cartao__cabecalho">
+      <div>
+        <h2>Estoque atual</h2>
+        @if (falhaAoCarregar() && produtos().length === 0) {
+          <p>Estoque indisponível</p>
+        } @else {
+          <p>{{ produtos().length }} produto(s) cadastrado(s)</p>
+        }
+      </div>
+    </div>
+
+    @if (carregando()) {
+      <div class="estado">
+        Carregando produtos...
+      </div>
+    } @else if (falhaAoCarregar() && produtos().length === 0) {
+      <div class="estado">
+        Não foi possível carregar os produtos.
+      </div>
+    } @else if (produtos().length === 0) {
+      <div class="estado">
+        Nenhum produto cadastrado.
+      </div>
+    } @else {
+      <div class="tabela-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Descrição</th>
+              <th class="coluna-saldo">Saldo</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (produto of produtos(); track produto.id) {
+              <tr>
+                <td>
+                  <strong>{{ produto.codigo }}</strong>
+                </td>
+
+                <td>{{ produto.descricao }}</td>
+
+                <td class="coluna-saldo">
+                  <span
+                    class="saldo"
+                    [class.saldo--baixo]="produto.saldo <= 2"
+                  >
+                    {{ produto.saldo }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
 </div>
