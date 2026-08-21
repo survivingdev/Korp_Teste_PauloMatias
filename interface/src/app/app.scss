@@ -1,0 +1,143 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.aplicacao {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.barra-lateral {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 18px;
+  background: #111827;
+  color: #f9fafb;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px 28px;
+
+  div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  strong {
+    font-size: 18px;
+  }
+
+  span:not(.marca__simbolo) {
+    margin-top: 2px;
+    color: #9ca3af;
+    font-size: 12px;
+  }
+}
+
+.marca__simbolo {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 10px;
+  background: #2563eb;
+  font-weight: 700;
+}
+
+.navegacao {
+  display: grid;
+  gap: 6px;
+}
+
+.navegacao__item {
+  padding: 11px 12px;
+  border-radius: 8px;
+  color: #d1d5db;
+  text-decoration: none;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+
+  &:hover {
+    background: #1f2937;
+    color: #fff;
+  }
+}
+
+.navegacao__item--ativo {
+  background: #1f2937;
+  color: #fff;
+  font-weight: 600;
+}
+
+.barra-lateral__rodape {
+  margin-top: auto;
+  padding: 24px 8px 0;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.conteudo {
+  min-width: 0;
+  background: #f3f4f6;
+}
+
+.cabecalho {
+  display: flex;
+  min-height: 76px;
+  align-items: center;
+  padding: 0 32px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #fff;
+
+  div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  strong {
+    color: #111827;
+    font-size: 15px;
+  }
+}
+
+.cabecalho__contexto {
+  margin-bottom: 3px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.pagina {
+  padding: 32px;
+}
+
+@media (max-width: 720px) {
+  .aplicacao {
+    grid-template-columns: 1fr;
+  }
+
+  .barra-lateral {
+    padding: 16px;
+  }
+
+  .navegacao {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .barra-lateral__rodape {
+    display: none;
+  }
+
+  .cabecalho {
+    padding: 0 20px;
+  }
+
+  .pagina {
+    padding: 20px;
+  }
+}
