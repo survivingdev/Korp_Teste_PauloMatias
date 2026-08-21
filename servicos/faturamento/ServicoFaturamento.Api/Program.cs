@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ServicoFaturamento.Api.Dados;
+using ServicoFaturamento.Api.Integracoes.Estoque;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,25 @@ var stringConexao = builder.Configuration.GetConnectionString("Faturamento")
 
 builder.Services.AddDbContext<FaturamentoDbContext>(opcoes =>
     opcoes.UseNpgsql(stringConexao));
+
+var urlBaseEstoque = builder.Configuration["Servicos:Estoque:UrlBase"]
+    ?? throw new InvalidOperationException(
+        "A URL do Serviço de Estoque não foi configurada.");
+
+if (!Uri.TryCreate(
+        urlBaseEstoque.TrimEnd('/') + "/",
+        UriKind.Absolute,
+        out var uriEstoque))
+{
+    throw new InvalidOperationException(
+        "A URL configurada para o Serviço de Estoque é inválida.");
+}
+
+builder.Services.AddHttpClient<ClienteEstoque>(cliente =>
+{
+    cliente.BaseAddress = uriEstoque;
+    cliente.Timeout = TimeSpan.FromSeconds(5);
+});
 
 var app = builder.Build();
 
