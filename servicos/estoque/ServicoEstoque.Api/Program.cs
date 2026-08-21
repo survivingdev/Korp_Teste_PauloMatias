@@ -4,9 +4,25 @@ using ServicoEstoque.Api.Dados;
 
 var builder = WebApplication.CreateBuilder(args);
 
+const string politicaCorsInterface = "InterfaceAngular";
+
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
+builder.Services.AddCors(opcoes =>
+{
+    opcoes.AddPolicy(
+        politicaCorsInterface,
+        politica =>
+        {
+            politica
+                .WithOrigins(
+                    "http://localhost:4200",
+                    "http://127.0.0.1:4200")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
 
 var stringConexao = builder.Configuration.GetConnectionString("Estoque")
     ?? throw new InvalidOperationException(
@@ -25,6 +41,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseCors(politicaCorsInterface);
 
 app.UseAuthorization();
 

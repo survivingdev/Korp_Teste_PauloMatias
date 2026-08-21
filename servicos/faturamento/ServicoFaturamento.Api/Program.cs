@@ -3,10 +3,25 @@ using ServicoFaturamento.Api.Dados;
 using ServicoFaturamento.Api.Integracoes.Estoque;
 
 var builder = WebApplication.CreateBuilder(args);
+const string politicaCorsInterface = "InterfaceAngular";
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
+builder.Services.AddCors(opcoes =>
+{
+    opcoes.AddPolicy(
+        politicaCorsInterface,
+        politica =>
+        {
+            politica
+                .WithOrigins(
+                    "http://localhost:4200",
+                    "http://127.0.0.1:4200")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
 
 var stringConexao = builder.Configuration.GetConnectionString("Faturamento")
     ?? throw new InvalidOperationException(
@@ -42,6 +57,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseCors(politicaCorsInterface);
 
 app.UseAuthorization();
 
