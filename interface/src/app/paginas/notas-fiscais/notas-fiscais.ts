@@ -38,6 +38,7 @@ export class NotasFiscais implements OnInit {
 
   readonly carregando = signal(false);
   readonly salvando = signal(false);
+  readonly notaProcessando = signal<number | null>(null);
 
   readonly mensagemErro = signal('');
   readonly mensagemSucesso = signal('');
@@ -162,6 +163,41 @@ export class NotasFiscais implements OnInit {
       });
   }
 
+  processarNota(nota: NotaFiscal): void {
+    if (
+      nota.status !== 'Aberta' ||
+      this.notaProcessando() !== null
+    ) {
+      return;
+    }
+
+    this.mensagemErro.set('');
+    this.mensagemSucesso.set('');
+    this.notaProcessando.set(nota.numero);
+
+    this.notasFiscaisService
+      .processar(nota.numero)
+      .pipe(
+        finalize(() => {
+          this.notaProcessando.set(null);
+        }),
+      )
+      .subscribe({
+        next: (notaProcessada) => {
+          this.mensagemSucesso.set(
+            `Nota fiscal nº ${notaProcessada.numero} processada com sucesso.`,
+          );
+
+          this.carregarDados();
+        },
+        error: (erro: HttpErrorResponse) => {
+          this.mensagemErro.set(
+            this.obterMensagemProcessamento(erro),
+          );
+        },
+      });
+  }
+
   descricaoProduto(produtoId: number): string {
     const produto = this.produtos().find(
       (item) => item.id === produtoId,
@@ -186,6 +222,33 @@ export class NotasFiscais implements OnInit {
         ],
       ],
     });
+  }
+
+  private obterMensagemProcessamento(
+    erro: HttpErrorResponse,
+  ): string {
+    if (erro.status === 409) {
+      return (
+        erro.error?.detail ??
+        'A nota fiscal não pôde ser processada.'
+      );
+    }
+
+    if (erro.status === 503) {
+      return (
+        erro.error?.detail ??
+        'O Serviço de Estoque está indisponível. Tente novamente.'
+      );
+    }
+
+    if (erro.status === 0) {
+      return 'Não foi possível conectar ao Serviço de Faturamento.';
+    }
+
+    return (
+      erro.error?.detail ??
+      'Não foi possível processar a nota fiscal.'
+    );
   }
 
   private obterMensagemErro(

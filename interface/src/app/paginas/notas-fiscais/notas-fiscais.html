@@ -182,7 +182,7 @@
         ) {
           <article class="nota">
             <div class="nota__cabecalho">
-              <div>
+              <div class="nota__identificacao">
                 <strong>
                   Nota nº {{ nota.numero }}
                 </strong>
@@ -196,14 +196,37 @@
                 </span>
               </div>
 
-              <span
-                class="status"
-                [class.status--fechada]="
-                  nota.status === 'Fechada'
-                "
-              >
-                {{ nota.status }}
-              </span>
+              <div class="nota__acoes">
+                <span
+                  class="status"
+                  [class.status--fechada]="
+                    nota.status === 'Fechada'
+                  "
+                >
+                  {{ nota.status }}
+                </span>
+
+                @if (nota.status === 'Aberta') {
+                  <button
+                    type="button"
+                    class="botao-imprimir"
+                    [disabled]="notaProcessando() !== null"
+                    [attr.aria-busy]="notaProcessando() === nota.numero"
+                    (click)="processarNota(nota)"
+                  >
+                    @if (notaProcessando() === nota.numero) {
+                      <span
+                        class="indicador-processamento"
+                        aria-hidden="true"
+                      ></span>
+
+                      Processando...
+                    } @else {
+                      Imprimir nota
+                    }
+                  </button>
+                }
+              </div>
             </div>
 
             <div class="nota__itens">

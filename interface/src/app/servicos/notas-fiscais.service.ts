@@ -28,4 +28,10 @@ export class NotasFiscaisService {
       requisicao,
     );
   }
+  processar(numero: number): Observable<NotaFiscal> {
+    return this.http.post<NotaFiscal>(
+      `${this.url}/${numero}/processar`,
+      {},
+    );
+  }
 }
