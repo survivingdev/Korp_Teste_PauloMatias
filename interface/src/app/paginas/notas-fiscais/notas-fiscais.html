@@ -1,10 +1,230 @@
 <header class="cabecalho-pagina">
   <div>
     <h1>Notas fiscais</h1>
-    <p>Crie, acompanhe e processe as notas fiscais.</p>
+    <p>
+      Crie notas com múltiplos produtos e acompanhe o processamento.
+    </p>
   </div>
+
+  <button
+    type="button"
+    class="botao-secundario"
+    (click)="carregarDados()"
+    [disabled]="carregando()"
+  >
+    Atualizar
+  </button>
 </header>
 
-<div class="cartao">
-  <p>A gestão de notas fiscais será implementada nesta seção.</p>
+@if (mensagemSucesso()) {
+  <div
+    class="mensagem mensagem--sucesso"
+    role="status"
+  >
+    {{ mensagemSucesso() }}
+  </div>
+}
+
+@if (mensagemErro()) {
+  <div
+    class="mensagem mensagem--erro"
+    role="alert"
+  >
+    {{ mensagemErro() }}
+  </div>
+}
+
+<div class="grade">
+  <section class="cartao">
+    <div class="cartao__cabecalho">
+      <div>
+        <h2>Nova nota fiscal</h2>
+        <p>
+          Adicione os produtos e informe as quantidades.
+        </p>
+      </div>
+    </div>
+
+    <form
+      class="formulario"
+      [formGroup]="formulario"
+      (ngSubmit)="criarNota()"
+    >
+      <div
+        class="itens"
+        formArrayName="itens"
+      >
+        @for (
+          item of itens.controls;
+          track $index;
+          let indice = $index
+        ) {
+          <div
+            class="item"
+            [formGroupName]="indice"
+          >
+            <div class="campo campo--produto">
+              <label [for]="'produto-' + indice">
+                Produto
+              </label>
+
+              <select
+                [id]="'produto-' + indice"
+                formControlName="produtoId"
+              >
+                <option [ngValue]="null">
+                  Selecione um produto
+                </option>
+
+                @for (
+                  produto of produtos();
+                  track produto.id
+                ) {
+                  <option [ngValue]="produto.id">
+                    {{ produto.codigo }} —
+                    {{ produto.descricao }}
+                    (saldo: {{ produto.saldo }})
+                  </option>
+                }
+              </select>
+
+              @if (
+                item.get('produtoId')?.touched &&
+                item.get('produtoId')?.invalid
+              ) {
+                <span class="campo__erro">
+                  Selecione um produto.
+                </span>
+              }
+            </div>
+
+            <div class="campo campo--quantidade">
+              <label [for]="'quantidade-' + indice">
+                Quantidade
+              </label>
+
+              <input
+                [id]="'quantidade-' + indice"
+                type="number"
+                formControlName="quantidade"
+                min="1"
+                step="1"
+              />
+
+              @if (
+                item.get('quantidade')?.touched &&
+                item.get('quantidade')?.invalid
+              ) {
+                <span class="campo__erro">
+                  Informe uma quantidade maior que zero.
+                </span>
+              }
+            </div>
+
+            <button
+              type="button"
+              class="botao-remover"
+              [disabled]="itens.length === 1"
+              (click)="removerItem(indice)"
+              aria-label="Remover item"
+            >
+              Remover
+            </button>
+          </div>
+        }
+      </div>
+
+      <button
+        type="button"
+        class="botao-adicionar"
+        (click)="adicionarItem()"
+      >
+        + Adicionar produto
+      </button>
+
+      <button
+        type="submit"
+        class="botao-primario"
+        [disabled]="salvando() || produtos().length === 0"
+      >
+        @if (salvando()) {
+          Criando nota...
+        } @else {
+          Criar nota fiscal
+        }
+      </button>
+    </form>
+  </section>
+
+  <section class="cartao cartao--lista">
+    <div class="cartao__cabecalho">
+      <div>
+        <h2>Notas fiscais</h2>
+        <p>
+          {{ notas().length }} nota(s) cadastrada(s)
+        </p>
+      </div>
+    </div>
+
+    @if (carregando()) {
+      <div class="estado">
+        Carregando notas fiscais...
+      </div>
+    } @else if (notas().length === 0) {
+      <div class="estado">
+        Nenhuma nota fiscal cadastrada.
+      </div>
+    } @else {
+      <div class="lista-notas">
+        @for (
+          nota of notas();
+          track nota.numero
+        ) {
+          <article class="nota">
+            <div class="nota__cabecalho">
+              <div>
+                <strong>
+                  Nota nº {{ nota.numero }}
+                </strong>
+
+                <span>
+                  {{
+                    nota.criadaEmUtc
+                      ? (nota.criadaEmUtc | date: 'dd/MM/yyyy HH:mm')
+                      : ''
+                  }}
+                </span>
+              </div>
+
+              <span
+                class="status"
+                [class.status--fechada]="
+                  nota.status === 'Fechada'
+                "
+              >
+                {{ nota.status }}
+              </span>
+            </div>
+
+            <div class="nota__itens">
+              @for (
+                item of nota.itens;
+                track item.produtoId
+              ) {
+                <div class="nota__item">
+                  <span>
+                    {{ descricaoProduto(item.produtoId) }}
+                  </span>
+
+                  <strong>
+                    {{ item.quantidade }} un.
+                  </strong>
+                </div>
+              }
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </section>
 </div>
